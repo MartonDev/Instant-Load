@@ -1,0 +1,19 @@
+{
+  "name": "instant-load",
+  "version": "0.1.0",
+  "description": "A JavaScript library to speed up your site",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MartonDev/Instant-Load.git"
+  },
+  "author": "Marton Lederer",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/MartonDev/Instant-Load/issues"
+  },
+  "homepage": "https://github.com/MartonDev/Instant-Load#readme"
+}
