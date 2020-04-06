@@ -22,7 +22,7 @@ let instantload, InstantLoad = instantload = function() {
   //custom InstantLoad events
   events = {preload: [], postload: [], change: [], init: []},
   //custom InstantLoad history, to overwrite the default
-  instantHistory = {};
+  instantHistory = [];
 
   //trigger custom InstantLoad events
   triggerEvent = (eventType) => {
@@ -89,21 +89,28 @@ let instantload, InstantLoad = instantload = function() {
 
   },
 
+  //removes hashes
+  clearURL = (url) => {
+
+    return url.split('#').join('');
+
+  },
+
   //change page to a preloaded one
   //updates the page body, updates the history, triggers change event
-  changePage = (element) => {
+  changePage = (preloadedPage, url) => {
 
     currentPageReq.abort();
 
     clearTrackedElements();
 
-    document.documentElement.replaceChild(element.preloadedPage.body, document.body);
-    document.documentElement.replaceChild(element.preloadedPage.head, document.head);
+    document.documentElement.replaceChild(preloadedPage.body, document.body);
+    document.documentElement.replaceChild(preloadedPage.head, document.head);
 
     //we need to manually replace scripts to make them function
     updateScripts();
 
-    history.pushState(null, null, element.href);
+    history.pushState(null, null, url);
 
     //updateStyles(element.preloadedPage.head);
     trackPreloadableElements();
@@ -146,7 +153,7 @@ let instantload, InstantLoad = instantload = function() {
     if(e.target.isPreloaded)
       return;
 
-    preloadPage(e.target.href.replace('#', ''), e.target, () => {
+    preloadPage(clearURL(e.target.href), e.target, () => {
 
       e.target.isPreloaded = true;
 
@@ -160,17 +167,25 @@ let instantload, InstantLoad = instantload = function() {
 
     e.preventDefault();
 
+    instantHistory.push({
+
+      location: clearURL(location.href),
+      document: document,
+      scrollPos: window.scrollY
+
+    });
+
     if(e.target.isPreloaded) {
 
-      changePage(e.target);
+      changePage(e.target.preloadedPage, e.target.href);
 
     }else {
 
       //if somewhy the page isn't preloaded yet, we need to load it before we change the page
-      preloadPage(e.target.href.replace('#', ''), e.target, () => {
+      preloadPage(clearURL(e.target.href), e.target, () => {
 
         e.target.isPreloaded = true;
-        changePage(e.target);
+        changePage(e.target.preloadedPage, e.target.href);
 
       });
 
@@ -302,7 +317,8 @@ let instantload, InstantLoad = instantload = function() {
 
     init: init,
     on: registerEvent,
-    isRunning: isRunning
+    isRunning: isRunning,
+    history: instantHistory
 
   };
 
