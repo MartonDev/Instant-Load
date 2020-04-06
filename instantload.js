@@ -42,6 +42,49 @@ let instantload, InstantLoad = instantload = function() {
 
   },
 
+  //update scritp tags
+  updateScripts = () => {
+
+    let originalScripts = [];
+
+    //since we delete and add scripts the querySelectorAll('script') content will always change, and we would loop through the cloned scripts too, we need to add the original scripts to an array
+    document.head.querySelectorAll('script').forEach((script) => {
+
+      if(!script.hasAttribute('instantload-blacklist'))
+        originalScripts.push(script);
+
+    });
+    document.body.querySelectorAll('script').forEach((script) => {
+
+      if(!script.hasAttribute('instantload-blacklist'))
+        originalScripts.push(script);
+
+    });
+
+    for(let i = 0; i < originalScripts.length; i++) {
+
+      let cloneScript = document.createElement('script'),
+      originalScript = originalScripts[i],
+      parent = originalScript.parentNode,
+      nextEl = originalScript.nextSiblings;
+
+      //cloning text
+      cloneScript.textContent = originalScript.textContent;
+
+      //cloning all attrs
+      for(let j = 0; j < originalScript.attributes.length; j++) {
+
+        cloneScript.setAttribute(originalScript.attributes[j].name, originalScript.attributes[j].value);
+
+      }
+
+      originalScript.remove();
+      parent.insertBefore(cloneScript, nextEl);
+
+    }
+
+  },
+
   //change page to a preloaded one
   //updates the page body, updates the history, triggers change event
   changePage = (element) => {
@@ -51,10 +94,14 @@ let instantload, InstantLoad = instantload = function() {
     clearTrackedElements();
 
     document.documentElement.replaceChild(element.preloadedPage.body, document.body);
-    document.title = element.preloadedPage.title
+    document.documentElement.replaceChild(element.preloadedPage.head, document.head);
+
+    //we need to manually replace scripts to make them function
+    updateScripts();
 
     history.pushState(null, null, element.href);
 
+    //updateStyles(element.preloadedPage.head);
     trackPreloadableElements();
 
     triggerEvent('change');
@@ -215,6 +262,13 @@ let instantload, InstantLoad = instantload = function() {
 
   },
 
+  //return if the library is running
+  isRunning = () => {
+
+    return running;
+
+  },
+
   //initialize InstantLoad to the page
   //return if there is already an instance of InstantLoad running or if the browser/protocol is not supported
   init = () => {
@@ -243,7 +297,8 @@ let instantload, InstantLoad = instantload = function() {
   return {
 
     init: init,
-    on: registerEvent
+    on: registerEvent,
+    isRunning: isRunning
 
   };
 
