@@ -110,11 +110,10 @@ let instantload, InstantLoad = instantload = function() {
     //we need to manually replace scripts to make them function
     updateScripts();
 
-    history.pushState(null, null, url);
+    if(url != null)
+      history.pushState(null, null, url);
 
-    //updateStyles(element.preloadedPage.head);
     trackPreloadableElements();
-
     triggerEvent('change');
 
   },
@@ -143,6 +142,22 @@ let instantload, InstantLoad = instantload = function() {
       callback();
 
     };
+
+  },
+
+  //back or forward button event
+  popstateEvent = (e) => {
+
+    for(let i = 0; i < instantHistory.length; i++) {
+
+      if(instantHistory[i].location == clearURL(location.href)) {
+
+        changePage(instantHistory[i].document);
+        break;
+
+      }
+
+    }
 
   },
 
@@ -226,6 +241,8 @@ let instantload, InstantLoad = instantload = function() {
       preloadableElements[i].addEventListener('click', mouseClickEvent);
 
     }
+
+    window.addEventListener('popstate', popstateEvent);
 
   },
 
