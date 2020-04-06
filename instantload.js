@@ -32,7 +32,8 @@ let instantload, InstantLoad = instantload = function(document, location, userAg
 
   changePage = (element) => {
 
-
+    history.pushState(null, null, element.href);
+    document.body = element.preloadedPage.body;
 
   },
 
@@ -43,7 +44,7 @@ let instantload, InstantLoad = instantload = function(document, location, userAg
     const page = new XMLHttpRequest();
 
     page.open('get', url);
-    page.timeout = 90000
+    page.timeout = 90000;
     page.send();
     page.onload = () => {
 
@@ -53,6 +54,8 @@ let instantload, InstantLoad = instantload = function(document, location, userAg
       element.preloadedPage = newDocument;
 
       triggerEvent('postload');
+
+      callback();
 
     };
 
@@ -72,6 +75,8 @@ let instantload, InstantLoad = instantload = function(document, location, userAg
   },
 
   mouseClickEvent = (e) => {
+
+    e.preventDefault();
 
     if(e.target.isPreloaded) {
 
@@ -139,7 +144,12 @@ let instantload, InstantLoad = instantload = function(document, location, userAg
 
   removeEventListeners = () => {
 
+    for(let i = 0; i < preloadableElements.length; i++) {
 
+      preloadableElements[i].removeEventListener('mouseover', mouseOverEvent);
+      preloadableElements[i].removeEventListener('click', mouseClickEvent);
+
+    }
 
   },
 
