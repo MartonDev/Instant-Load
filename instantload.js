@@ -1,7 +1,24 @@
 let instantload, InstantLoad = instantload = function() {
 
+  let running = false,
+  preloadableElements = [];
+
   const preloadedPages = [],
-  preloadableElements = [],
+  events = {loaded: [], change: [], init: []},
+  triggerEvent = (eventType) => {
+
+    for(let i = 0; i < events[eventType].length; i++) {
+
+      events[eventType][i]();
+
+    }
+
+  },
+  registerEvent = (eventType, callback) => {
+
+    events[eventType].push(callback);
+
+  },
   changePage = (element) => {
 
 
@@ -16,6 +33,7 @@ let instantload, InstantLoad = instantload = function() {
     page.onload = () => {
 
       element.preloadedPage = page.responseText;
+      triggerEvent('loaded');
 
     };
 
@@ -62,11 +80,8 @@ let instantload, InstantLoad = instantload = function() {
 
     const localhost = window.location.protocol + '//' + window.location.host + '/';
 
-    if(element.taget || element.href.indexOf(localhost) != 0 || isNoPreload(element)) {
-
+    if(element.taget || element.href.indexOf(localhost) != 0 || isNoPreload(element))
       return false;
-
-    }
 
     return true;
 
@@ -109,13 +124,20 @@ let instantload, InstantLoad = instantload = function() {
   },
   init = () => {
 
+    if(running)
+      return;
+
+    running = true;
+
     trackPreloadableElements();
+    triggerEvent('init');
 
   };
 
   return {
 
-    init: init
+    init: init,
+    on: registerEvent
 
   };
 
