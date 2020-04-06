@@ -42,7 +42,7 @@ let instantload, InstantLoad = instantload = function() {
 
   },
 
-  //update scritp tags
+  //update script tags
   updateScripts = () => {
 
     let originalScripts = [];
@@ -63,6 +63,9 @@ let instantload, InstantLoad = instantload = function() {
 
     for(let i = 0; i < originalScripts.length; i++) {
 
+      if(originalScripts[i].instantload_tracked != true)
+        continue;
+
       let cloneScript = document.createElement('script'),
       originalScript = originalScripts[i],
       parent = originalScript.parentNode,
@@ -70,6 +73,7 @@ let instantload, InstantLoad = instantload = function() {
 
       //cloning text
       cloneScript.textContent = originalScript.textContent;
+      cloneScript.instantload_tracked = true;
 
       //cloning all attrs
       for(let j = 0; j < originalScript.attributes.length; j++) {
