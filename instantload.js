@@ -3,17 +3,28 @@
  * InstantLoad
  * Github: https://github.com/MartonDev/Instant-Load
  * Created by Marton Lederer (https://marton.lederer.hu)
+ * Copyright (c) 2020- Marton Lederer
  *
  */
 
 let instantload, InstantLoad = instantload = function(document, location, userAgent) {
 
+  //elements needed to be changed durring the InstantLoad processes
+  //is the InstantLoad script running
   let running = false,
-  preloadableElements = [];
+  //all elements that can be preloaded
+  preloadableElements = [],
+  //the current request to preload a page
+  currentPageReq = null;
 
+  //functions and arrays
   const preloadedPages = [],
+  //custom InstantLoad events
   events = {preload: [], postload: [], change: [], init: []},
+  //custom InstantLoad history, to overwrite the default
+  instantHistory = {};
 
+  //trigger custom InstantLoad events
   triggerEvent = (eventType) => {
 
     for(let i = 0; i < events[eventType].length; i++) {
@@ -24,33 +35,49 @@ let instantload, InstantLoad = instantload = function(document, location, userAg
 
   },
 
+  //register a new InstantLoad event
   registerEvent = (eventType, callback) => {
 
     events[eventType].push(callback);
 
   },
 
+  //change page to a preloaded one
+  //updates the page body, updates the history, triggers change event
   changePage = (element) => {
 
+    currentPageReq.abort();
+
+    clearTrackedElements();
+
+    document.documentElement.replaceChild(element.preloadedPage.body, document.body);
+    document.title = element.preloadedPage.title
+
     history.pushState(null, null, element.href);
-    document.body = element.preloadedPage.body;
+
+    trackPreloadableElements();
+
+    triggerEvent('change');
 
   },
 
+  //send a request to a page and preload it
+  //triggers preload event, stores the preloaded data within the element, triggers postload event
   preloadPage = (url, element, callback) => {
 
     triggerEvent('preload');
 
-    const page = new XMLHttpRequest();
+    currentPageReq = new XMLHttpRequest();
 
-    page.open('get', url);
-    page.timeout = 90000;
-    page.send();
-    page.onload = () => {
+    currentPageReq.open('get', url);
+    currentPageReq.timeout = 90000;
+    currentPageReq.send();
+    currentPageReq.onload = () => {
 
+      //creating an empty document to fill with the response
       let newDocument = document.implementation.createHTMLDocument('');
 
-      newDocument.documentElement.innerHTML = page.responseText;
+      newDocument.documentElement.innerHTML = currentPageReq.responseText;
       element.preloadedPage = newDocument;
 
       triggerEvent('postload');
@@ -61,6 +88,8 @@ let instantload, InstantLoad = instantload = function(document, location, userAg
 
   },
 
+  //hover event of a preloadable element
+  //calls the preloadPage() function to preload the target of the hovered element
   mouseOverEvent = (e) => {
 
     if(e.target.isPreloaded)
@@ -74,6 +103,8 @@ let instantload, InstantLoad = instantload = function(document, location, userAg
 
   },
 
+  //mouse click event of a preloadable element
+  //prevents the default redirect action, preloads the page if it isn't preloaded already, calls the changePage() function to update the document
   mouseClickEvent = (e) => {
 
     e.preventDefault();
@@ -84,6 +115,7 @@ let instantload, InstantLoad = instantload = function(document, location, userAg
 
     }else {
 
+      //if somewhy the page isn't preloaded yet, we need to load it before we change the page
       preloadPage(e.target.href.replace('#', ''), e.target, () => {
 
         e.target.isPreloaded = true;
@@ -95,6 +127,8 @@ let instantload, InstantLoad = instantload = function(document, location, userAg
 
   },
 
+  //the 'instantload-blacklist' attribute can be used for InstantLoad to ignore elements
+  //this is necessary for the instantload scripts
   isNoPreload = (element) => {
 
     if(element.hasAttribute('instantload-blacklist'))
@@ -104,6 +138,8 @@ let instantload, InstantLoad = instantload = function(document, location, userAg
 
   },
 
+  //check if the desired element is preloadable
+  //check if the target is not '_blank', if the target doesn't point to a local url and if it is blacklisted
   isPreloadable = (element) => {
 
     const localhost =  location.protocol + '//' +  location.host + '/';
@@ -115,6 +151,7 @@ let instantload, InstantLoad = instantload = function(document, location, userAg
 
   },
 
+  //adds InstantLoad event listeners
   addEventListeners = () => {
 
     for(let i = 0; i < preloadableElements.length; i++) {
@@ -126,6 +163,7 @@ let instantload, InstantLoad = instantload = function(document, location, userAg
 
   },
 
+  //tracks all the preloadable elements using the isPreloadable function and calls the addEventListeners() function
   trackPreloadableElements = () => {
 
     document.querySelectorAll('a').forEach(function(element) {
@@ -142,6 +180,7 @@ let instantload, InstantLoad = instantload = function(document, location, userAg
 
   },
 
+  //removes InstantLoad event listeners
   removeEventListeners = () => {
 
     for(let i = 0; i < preloadableElements.length; i++) {
@@ -153,6 +192,7 @@ let instantload, InstantLoad = instantload = function(document, location, userAg
 
   },
 
+  //calls the removeEventListeners() function and clears all preloadable elements
   clearTrackedElements = () => {
 
     removeEventListeners();
@@ -160,12 +200,40 @@ let instantload, InstantLoad = instantload = function(document, location, userAg
 
   },
 
+  //checks if it's supported to use InstantLoad
+  isSupported = () => {
+
+    //if the pushState() function is not present in the History API, InstantLoad is not supported
+    if(!'pushState' in history)
+      return false;
+
+    //you need to host your files from a server, file: protocol is not working, because we cannot preload from local machine
+    if(location.protocol == 'file:')
+      return false;
+
+    return true;
+
+  },
+
+  //initialize InstantLoad to the page
+  //return if there is already an instance of InstantLoad running or if the browser/protocol is not supported
   init = () => {
 
-    if(running)
+    if(running) {
+
+      console.warn('InstantLoad is already initialized.');
       return;
 
+    }
+
     running = true;
+
+    if(!isSupported()) {
+
+      console.error('InstantLoad is not supported in this browser or protocol!');
+      return;
+
+    }
 
     trackPreloadableElements();
     triggerEvent('init');

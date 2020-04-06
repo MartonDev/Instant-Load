@@ -2,18 +2,21 @@
 <html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8">
-    <title></title>
+    <title>Index page</title>
   </head>
   <body>
 
     <h1>Index page</h1>
     <a href="second.html">Go to second</a>
 
-    <script src="../instantload.js"></script>
-    <script>
+    <script src="../instantload.js" instantload-blacklist></script>
+    <script instantload-blacklist>
       InstantLoad.on('init', function() {console.log('init triggered');});
+      InstantLoad.on('preload', function() {console.log('before loading page');});
+      InstantLoad.on('postload', function() {console.log('after loading page');});
+      InstantLoad.on('change', function() {console.log('page changed');});
     </script>
-    <script>InstantLoad.init();</script>
+    <script instantload-blacklist>InstantLoad.init();</script>
 
   </body>
 </html>
