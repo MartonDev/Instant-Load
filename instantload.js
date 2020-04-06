@@ -1,10 +1,19 @@
-let instantload, InstantLoad = instantload = function() {
+/*
+ *
+ * InstantLoad
+ * Github: https://github.com/MartonDev/Instant-Load
+ * Created by Marton Lederer (https://marton.lederer.hu)
+ *
+ */
+
+let instantload, InstantLoad = instantload = function(document, location, userAgent) {
 
   let running = false,
   preloadableElements = [];
 
   const preloadedPages = [],
-  events = {loaded: [], change: [], init: []},
+  events = {preload: [], postload: [], change: [], init: []},
+
   triggerEvent = (eventType) => {
 
     for(let i = 0; i < events[eventType].length; i++) {
@@ -14,30 +23,41 @@ let instantload, InstantLoad = instantload = function() {
     }
 
   },
+
   registerEvent = (eventType, callback) => {
 
     events[eventType].push(callback);
 
   },
+
   changePage = (element) => {
 
 
 
   },
+
   preloadPage = (url, element, callback) => {
+
+    triggerEvent('preload');
 
     const page = new XMLHttpRequest();
 
     page.open('get', url);
+    page.timeout = 90000
     page.send();
     page.onload = () => {
 
-      element.preloadedPage = page.responseText;
-      triggerEvent('loaded');
+      let newDocument = document.implementation.createHTMLDocument('');
+
+      newDocument.documentElement.innerHTML = page.responseText;
+      element.preloadedPage = newDocument;
+
+      triggerEvent('postload');
 
     };
 
   },
+
   mouseOverEvent = (e) => {
 
     if(e.target.isPreloaded)
@@ -50,6 +70,7 @@ let instantload, InstantLoad = instantload = function() {
     });
 
   },
+
   mouseClickEvent = (e) => {
 
     if(e.target.isPreloaded) {
@@ -68,6 +89,7 @@ let instantload, InstantLoad = instantload = function() {
     }
 
   },
+
   isNoPreload = (element) => {
 
     if(element.hasAttribute('instantload-blacklist'))
@@ -76,9 +98,10 @@ let instantload, InstantLoad = instantload = function() {
     return false;
 
   },
+
   isPreloadable = (element) => {
 
-    const localhost = window.location.protocol + '//' + window.location.host + '/';
+    const localhost =  location.protocol + '//' +  location.host + '/';
 
     if(element.taget || element.href.indexOf(localhost) != 0 || isNoPreload(element))
       return false;
@@ -86,6 +109,7 @@ let instantload, InstantLoad = instantload = function() {
     return true;
 
   },
+
   addEventListeners = () => {
 
     for(let i = 0; i < preloadableElements.length; i++) {
@@ -96,6 +120,7 @@ let instantload, InstantLoad = instantload = function() {
     }
 
   },
+
   trackPreloadableElements = () => {
 
     document.querySelectorAll('a').forEach(function(element) {
@@ -111,17 +136,20 @@ let instantload, InstantLoad = instantload = function() {
     addEventListeners();
 
   },
+
   removeEventListeners = () => {
 
 
 
   },
+
   clearTrackedElements = () => {
 
     removeEventListeners();
     preloadableElements = [];
 
   },
+
   init = () => {
 
     if(running)
@@ -141,4 +169,4 @@ let instantload, InstantLoad = instantload = function() {
 
   };
 
-}();
+}(document, location, navigator.userAgent);
