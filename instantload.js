@@ -7,7 +7,7 @@
  *
  */
 
-let instantload, InstantLoad = instantload = function(document, location, userAgent) {
+let instantload, InstantLoad = instantload = function() {
 
   //elements needed to be changed durring the InstantLoad processes
   //is the InstantLoad script running
@@ -247,4 +247,4 @@ let instantload, InstantLoad = instantload = function(document, location, userAg
 
   };
 
-}(document, location, navigator.userAgent);
+}();
