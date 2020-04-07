@@ -15,16 +15,86 @@ let instantload, InstantLoad = instantload = function() {
   //all elements that can be preloaded
   preloadableElements = [],
   //the current request to preload a page
-  currentPageReq = null,
-  //InstantLoad config, first passed through the init() function, can be changed later
-  config = {};
+  currentPageReq = null;
 
   //functions and arrays
   const preloadedPages = [],
   //custom InstantLoad events
   events = {preload: [], postload: [], change: [], init: []},
   //custom InstantLoad history, to overwrite the default
-  instantHistory = {};
+  instantHistory = {},
+
+  //different styles when changing page
+  loadingStyle = {
+
+    bar: {
+
+      startLoading: () => {
+
+
+
+      },
+
+      endLoading: () => {
+
+
+
+      }
+
+    },
+
+    blink: {
+
+      startLoading: () => {
+
+
+
+      },
+
+      endLoading: () => {
+
+
+
+      }
+
+    },
+
+    circle: {
+
+      startLoading: () => {
+
+
+
+      },
+
+      endLoading: () => {
+
+
+
+      }
+
+    },
+
+    invisible: {
+
+      startLoading: () => {
+
+
+
+      },
+
+      endLoading: () => {
+
+
+
+      }
+
+    }
+
+  },
+
+  //InstantLoad config, first passed through the init() function, can be changed later
+  config = {reloadPagesOnPopstate: false, loadingStyle: loadingStyle.bar},
 
   //trigger custom InstantLoad events
   triggerEvent = (eventType) => {
@@ -102,11 +172,18 @@ let instantload, InstantLoad = instantload = function() {
   //updates the event listeners to listen for newly added preloadable elements
   domChangeListener = new MutationObserver((mutations) => {
 
-    const changedHyperlinks = (Array.from(mutations[0].addedNodes).filter((node) => {
+    const changedHyperlinks = [];
 
-      return (node.tagName != null && node.tagName.toLowerCase() == 'a' && isPreloadable(node));
+    for(let i = 0; i < mutations.length; i++) {
 
-    }));
+      mutations[i].addedNodes.forEach((node) => {
+
+        if(node.tagName != null && node.tagName.toLowerCase() == 'a' && isPreloadable(node))
+          changedHyperlinks.push(node);
+
+      });
+
+    }
 
     if(changedHyperlinks.legth == 0)
       return;
@@ -358,8 +435,11 @@ let instantload, InstantLoad = instantload = function() {
 
     }
 
-    if(cfg != null)
-      config = cfg;
+    if(cfg != null) {
+
+      //TODO: update config here with for loop using the keys
+
+    }
 
     trackPreloadableElements();
 
@@ -380,6 +460,7 @@ let instantload, InstantLoad = instantload = function() {
     init: init,
     on: registerEvent,
     config: getConfig,
+    configOptions: {loadingStyles: loadingStyle},
     isRunning: isRunning,
     history: instantHistory
 
