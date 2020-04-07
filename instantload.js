@@ -195,6 +195,7 @@ let instantload, InstantLoad = instantload = function() {
 
     if(e.target.isPreloaded) {
 
+      e.target.isPreloaded = false;
       changePage(e.target.preloadedPage, e.target.href);
 
     }else {
