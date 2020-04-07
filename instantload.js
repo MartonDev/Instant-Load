@@ -15,7 +15,9 @@ let instantload, InstantLoad = instantload = function() {
   //all elements that can be preloaded
   preloadableElements = [],
   //the current request to preload a page
-  currentPageReq = null;
+  currentPageReq = null,
+  //InstantLoad config, first passed through the init() function, can be changed later
+  config = {};
 
   //functions and arrays
   const preloadedPages = [],
@@ -96,6 +98,24 @@ let instantload, InstantLoad = instantload = function() {
 
   },
 
+  //listen for changes in the dom with the MutationObserver API
+  //updates the event listeners to listen for newly added preloadable elements
+  domChangeListener = new MutationObserver((mutations) => {
+
+    const changedHyperlinks = (Array.from(mutations[0].addedNodes).filter((node) => {
+
+      return (node.tagName != null && node.tagName.toLowerCase() == 'a' && isPreloadable(node));
+
+    }));
+
+    if(changedHyperlinks.legth == 0)
+      return;
+
+    clearTrackedElements();
+    trackPreloadableElements();
+
+  }),
+
   //change page to a preloaded one
   //updates the page body, updates the history, triggers change event
   changePage = (preloadedPage, url) => {
@@ -104,6 +124,7 @@ let instantload, InstantLoad = instantload = function() {
     currentPageReq.abort();
 
     clearTrackedElements();
+    domChangeListener.disconnect();
 
     document.documentElement.replaceChild(preloadedPage.body, document.body);
     document.documentElement.replaceChild(preloadedPage.head, document.head);
@@ -124,6 +145,7 @@ let instantload, InstantLoad = instantload = function() {
 
     }
 
+    domChangeListener.observe(document.body, {childList: true});
     trackPreloadableElements();
     triggerEvent('change');
 
@@ -227,7 +249,7 @@ let instantload, InstantLoad = instantload = function() {
   //check if the target is not '_blank', if the target doesn't point to a local url and if it is blacklisted
   isPreloadable = (element) => {
 
-    const localhost =  location.protocol + '//' +  location.host + '/';
+    const localhost = location.protocol + '//' + location.host + '/';
 
     if(element.taget || element.href.indexOf(localhost) != 0 || isNoPreload(element))
       return false;
@@ -309,9 +331,16 @@ let instantload, InstantLoad = instantload = function() {
 
   },
 
+  //return the config
+  getConfig = () => {
+
+    return config;
+
+  },
+
   //initialize InstantLoad to the page
   //return if there is already an instance of InstantLoad running or if the browser/protocol is not supported
-  init = () => {
+  init = (cfg) => {
 
     if(running) {
 
@@ -329,6 +358,9 @@ let instantload, InstantLoad = instantload = function() {
 
     }
 
+    if(cfg != null)
+      config = cfg;
+
     trackPreloadableElements();
 
     instantHistory[clearURL(location.href)] = {
@@ -337,6 +369,7 @@ let instantload, InstantLoad = instantload = function() {
       scrollPos: {x: window.scrollX, y: window.scrollY}
 
     };
+    domChangeListener.observe(document.body, {childList: true});
 
     triggerEvent('init');
 
@@ -346,6 +379,7 @@ let instantload, InstantLoad = instantload = function() {
 
     init: init,
     on: registerEvent,
+    config: getConfig,
     isRunning: isRunning,
     history: instantHistory
 
