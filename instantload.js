@@ -100,6 +100,7 @@ let instantload, InstantLoad = instantload = function() {
   //updates the page body, updates the history, triggers change event
   changePage = (preloadedPage, url) => {
 
+    instantHistory[clearURL(location.href)].scrollPos = {x: window.scrollX, y: window.scrollY};
     currentPageReq.abort();
 
     clearTrackedElements();
@@ -110,18 +111,21 @@ let instantload, InstantLoad = instantload = function() {
     //we need to manually replace scripts to make them function
     updateScripts();
 
-    if(url != null)
+    if(url != null) {
+
       history.pushState(null, null, url);
+      scrollTo(0, 0);
+      instantHistory[clearURL(location.href)] = {
+
+        document: {head: document.head, body: document.body},
+        scrollPos: {x: window.scrollX, y: window.scrollY}
+
+      };
+
+    }
 
     trackPreloadableElements();
     triggerEvent('change');
-
-    instantHistory[clearURL(location.href)] = {
-
-      document: {head: document.head, body: document.body},
-      scrollPos: window.scrollY
-
-    };
 
   },
 
@@ -162,6 +166,7 @@ let instantload, InstantLoad = instantload = function() {
     }else {
 
       changePage(instantHistory[clearURL(location.href)].document);
+      scrollTo(instantHistory[clearURL(location.href)].scrollPos.x, instantHistory[clearURL(location.href)].scrollPos.y);
 
     }
 
@@ -328,7 +333,7 @@ let instantload, InstantLoad = instantload = function() {
     instantHistory[clearURL(location.href)] = {
 
       document: {head: document.head, body: document.body},
-      scrollPos: window.scrollY
+      scrollPos: {x: window.scrollX, y: window.scrollY}
 
     };
 

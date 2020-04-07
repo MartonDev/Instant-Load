@@ -9,7 +9,11 @@
     <h1>Index page</h1>
     <a href="second.html">Go to second</a>
 
-    <script src="../instantload.js" instantload-blacklist></script>
+    <div style="height: 100vw">
+
+    </div>
+
+    <script src="../instantload.min.js" instantload-blacklist></script>
     <script instantload-blacklist>
       InstantLoad.on('init', function() {console.log('init triggered');});
       InstantLoad.on('preload', function() {console.log('before loading page');});
