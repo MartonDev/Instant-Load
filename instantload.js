@@ -116,6 +116,13 @@ let instantload, InstantLoad = instantload = function() {
     trackPreloadableElements();
     triggerEvent('change');
 
+    instantHistory[clearURL(location.href)] = {
+
+      document: {head: document.head, body: document.body},
+      scrollPos: window.scrollY
+
+    };
+
   },
 
   //send a request to a page and preload it
@@ -148,7 +155,15 @@ let instantload, InstantLoad = instantload = function() {
   //back or forward button event
   popstateEvent = (e) => {
 
-    changePage(instantHistory[clearURL(location.href)].document);
+    if(instantHistory[clearURL(location.href)] == null) {
+
+      location.reload();
+
+    }else {
+
+      changePage(instantHistory[clearURL(location.href)].document);
+
+    }
 
   },
 
@@ -172,13 +187,6 @@ let instantload, InstantLoad = instantload = function() {
   mouseClickEvent = (e) => {
 
     e.preventDefault();
-
-    instantHistory[clearURL(location.href)] = {
-
-      document: {head: document.head, body: document.body},
-      scrollPos: window.scrollY
-
-    };
 
     if(e.target.isPreloaded) {
 
@@ -316,6 +324,14 @@ let instantload, InstantLoad = instantload = function() {
     }
 
     trackPreloadableElements();
+
+    instantHistory[clearURL(location.href)] = {
+
+      document: {head: document.head, body: document.body},
+      scrollPos: window.scrollY
+
+    };
+
     triggerEvent('init');
 
   };
