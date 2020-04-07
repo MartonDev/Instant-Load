@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/MartonDev/Instant-Load/issues"
   },
-  "homepage": "https://github.com/MartonDev/Instant-Load#readme"
+  "homepage": "https://github.com/MartonDev/Instant-Load#readme",
+  "devDependencies": {
+    "uglify-js": "^3.8.1"
+  }
 }
