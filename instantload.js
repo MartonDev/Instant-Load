@@ -22,7 +22,7 @@ let instantload, InstantLoad = instantload = function() {
   //custom InstantLoad events
   events = {preload: [], postload: [], change: [], init: []},
   //custom InstantLoad history, to overwrite the default
-  instantHistory = [];
+  instantHistory = {};
 
   //trigger custom InstantLoad events
   triggerEvent = (eventType) => {
@@ -148,16 +148,7 @@ let instantload, InstantLoad = instantload = function() {
   //back or forward button event
   popstateEvent = (e) => {
 
-    for(let i = 0; i < instantHistory.length; i++) {
-
-      if(instantHistory[i].location == clearURL(location.href)) {
-
-        changePage(instantHistory[i].document);
-        break;
-
-      }
-
-    }
+    changePage(instantHistory[clearURL(location.href)].document);
 
   },
 
@@ -182,13 +173,12 @@ let instantload, InstantLoad = instantload = function() {
 
     e.preventDefault();
 
-    instantHistory.push({
+    instantHistory[clearURL(location.href)] = {
 
-      location: clearURL(location.href),
-      document: document,
+      document: {head: document.head, body: document.body},
       scrollPos: window.scrollY
 
-    });
+    };
 
     if(e.target.isPreloaded) {
 
