@@ -7,11 +7,11 @@ InstantLoad makes your website a one-page website by preloading the next page on
 ## Install
 CDN:
 
-    cdn_link
+    https://unpkg.com/instant-load@0.1.0/instantload.min.js
 
 NPM:
 
-    npm_install_command
+    npm i instant-load
 
 ## Initialize
 Place the InstantLoad script on the bottom of your webpage, before any other scripts, like this:
@@ -35,7 +35,7 @@ InstantLoad offers high level customizations via it's config. You can pass your 
 |reloadPagesOnPopstate|`boolean`                      |If `true`, on pressing the back/forward button, the target page will be reloaded. <br>Default: `false`|
 |loadingStyle               |`InstantLoad.configOptions.loadingStyles`            |Customize the loading transition.<br>Possible values:<br>- `bar`<br> - `blink`<br>- `circle`<br>- `invisible`<br>Default: `bar`|
 
-More comming soon...
+More coming soon...
 
 ## Customize the loading styles
 You can configure the different loading styles via CSS. You can find the CSS selectors to use above.
