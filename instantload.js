@@ -112,6 +112,7 @@ let instantload, InstantLoad = instantload = function() {
         circle.classList.add('circle');
         circle.id = 'instantload-circle';
         spinner.classList.add('spinner');
+        spinner.id = 'instantload-circle-spinner';
         circle.appendChild(spinner);
         instantloadContainer.appendChild(circle);
         circle.style.opacity = '1';
