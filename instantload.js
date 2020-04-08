@@ -96,6 +96,16 @@ let instantload, InstantLoad = instantload = function() {
   //InstantLoad config, first passed through the init() function, can be changed later
   config = {reloadPagesOnPopstate: false, loadingStyle: loadingStyle.bar},
 
+  //add custom css for loading styles and loading element
+  addCustomStyleAndElements = () => {
+
+    const styleElement = document.createElement('style');
+    styleElement.innerText = '.instantload-container {position: absolute; top: 0; left:0; z-index: 1000000;}';
+
+    document.head.appendChild(styleElement);
+
+  },
+
   //trigger custom InstantLoad events
   triggerEvent = (eventType) => {
 
@@ -441,6 +451,7 @@ let instantload, InstantLoad = instantload = function() {
 
     }
 
+    addCustomStyleAndElements();
     trackPreloadableElements();
 
     instantHistory[clearURL(location.href)] = {
