@@ -340,14 +340,28 @@ let instantload, InstantLoad = instantload = function() {
   //back or forward button event
   popstateEvent = (e) => {
 
-    if(instantHistory[clearURL(location.href)] == null) {
+    if(config.reloadPagesOnPopstate) {
 
-      location.reload();
+      const fakePreloadElement = document.createElement('a');
+
+      preloadPage(clearURL(location.href), fakePreloadElement, () => {
+
+        changePage(fakePreloadElement.preloadedPage);
+
+      });
 
     }else {
 
-      changePage(instantHistory[clearURL(location.href)].document);
-      scrollTo(instantHistory[clearURL(location.href)].scrollPos.x, instantHistory[clearURL(location.href)].scrollPos.y);
+      if(instantHistory[clearURL(location.href)] == null) {
+
+        location.reload();
+
+      }else {
+
+        changePage(instantHistory[clearURL(location.href)].document);
+        scrollTo(instantHistory[clearURL(location.href)].scrollPos.x, instantHistory[clearURL(location.href)].scrollPos.y);
+
+      }
 
     }
 

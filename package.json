@@ -1,6 +1,6 @@
 {
   "name": "instant-load",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "A JavaScript library to speed up your site",
   "main": "index.js",
   "scripts": {
