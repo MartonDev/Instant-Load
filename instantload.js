@@ -15,7 +15,9 @@ let instantload, InstantLoad = instantload = function() {
   //all elements that can be preloaded
   preloadableElements = [],
   //the current request to preload a page
-  currentPageReq = null;
+  currentPageReq = null,
+  //the instentload container in the dom
+  instantloadContainer = null;
 
   //functions and arrays
   const preloadedPages = [],
@@ -31,13 +33,37 @@ let instantload, InstantLoad = instantload = function() {
 
       startLoading: () => {
 
+        const bar = document.createElement('div');
 
+        bar.classList.add('bar');
+        bar.id = 'instantload-bar';
+
+        bar.loadingIncrease = setInterval(() => {
+
+          bar.style.width = `calc(${bar.style.width} + 20vw)`;
+
+        }, 830);
+
+        instantloadContainer.appendChild(bar);
 
       },
 
       endLoading: () => {
 
+        const bar = instantloadContainer.querySelectorAll('.bar')[0];
 
+        bar.loadingIncrease = null;
+        bar.style.width = '100vw';
+        setTimeout(() => {
+
+          bar.style.opacity = '0';
+          setTimeout(() => {
+
+            bar.remove();
+
+          }, 300);
+
+        }, 170);
 
       }
 
@@ -47,13 +73,30 @@ let instantload, InstantLoad = instantload = function() {
 
       startLoading: () => {
 
+        const whiteScreen = document.createElement('div');
 
+        whiteScreen.classList.add('blink');
+        whiteScreen.id = 'instantload-whiteScreen';
+        instantloadContainer.appendChild(whiteScreen);
+        whiteScreen.style.opacity = '1';
 
       },
 
       endLoading: () => {
 
+        const whiteScreen = instantloadContainer.querySelectorAll('.blink')[0];
 
+        setTimeout(() => {
+
+          whiteScreen.style.opacity = '0';
+
+          setTimeout(() => {
+
+            whiteScreen.remove();
+
+          }, 300);
+
+        }, 300);
 
       }
 
@@ -63,13 +106,33 @@ let instantload, InstantLoad = instantload = function() {
 
       startLoading: () => {
 
+        const circle = document.createElement('div'),
+        spinner = document.createElement('div');
 
+        circle.classList.add('circle');
+        circle.id = 'instantload-circle';
+        spinner.classList.add('spinner');
+        circle.appendChild(spinner);
+        instantloadContainer.appendChild(circle);
+        circle.style.opacity = '1';
 
       },
 
       endLoading: () => {
 
+        const circle = instantloadContainer.querySelectorAll('.circle')[0];
 
+        setTimeout(() => {
+
+          circle.style.opacity = '0';
+
+          setTimeout(() => {
+
+            circle.remove();
+
+          }, 300);
+
+        }, 450);
 
       }
 
@@ -79,13 +142,13 @@ let instantload, InstantLoad = instantload = function() {
 
       startLoading: () => {
 
-
+        //nothing here, invisible style has no loading animation
 
       },
 
       endLoading: () => {
 
-
+        //nothing here, invisible style has no loading animation
 
       }
 
@@ -100,9 +163,13 @@ let instantload, InstantLoad = instantload = function() {
   addCustomStyleAndElements = () => {
 
     const styleElement = document.createElement('style');
-    styleElement.innerText = '.instantload-container {position: absolute; top: 0; left:0; z-index: 1000000;}';
+    instantloadContainer = document.createElement('div');
+
+    styleElement.innerText = '.instantload-container {position: fixed; top: 0; left: 0; width: 100vw; z-index: 1000000; overflow: hidden;} .instantload-container .bar {height: 4px; width: 0vw; background-color: #4287f5; opacity: 1; -webkit-transition: all .3s; -moz-transition: all .3s; -ms-transition: all .3s; -o-transition: all .3s; transition: all .3s;} .instantload-container .blink {width: 100vw; height: 100vh; background-color: #fff; opacity: 0; -webkit-transition: all .3s; -moz-transition: all .3s; -ms-transition: all .3s; -o-transition: all .3s; transition: all .3s;} .instantload-container .circle {position: relative; width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, .5); opacity: 0; -webkit-transition: all .3s; -moz-transition: all .3s; -ms-transition: all .3s; -o-transition: all .3s; transition: all .3s;} .instantload-container .circle .spinner {position: absolute; top: 50%; left: 50%; width: 50px; height: 50px; border: 3px solid rgba(255, 255, 255, .3); border-radius: 50%; border-top-color: #fff; animation: spin .44s ease-in-out infinite; -webkit-animation: spin .44s ease-in-out infinite;} @keyframes spin {to{transform: rotate(360deg) translate(0, 0); -webkit-transform: rotate(360deg) translate(0, 0);}}@-webkit-keyframes spin {to{transform: rotate(360deg) translate(0, 0); -webkit-transform: rotate(360deg) translate(0, 0);}}}';
+    instantloadContainer.classList.add('instantload-container');
 
     document.head.appendChild(styleElement);
+    document.body.appendChild(instantloadContainer);
 
   },
 
@@ -216,6 +283,9 @@ let instantload, InstantLoad = instantload = function() {
     document.documentElement.replaceChild(preloadedPage.body, document.body);
     document.documentElement.replaceChild(preloadedPage.head, document.head);
 
+    addCustomStyleAndElements();
+    config.loadingStyle.startLoading();
+
     //we need to manually replace scripts to make them function
     updateScripts();
 
@@ -235,6 +305,7 @@ let instantload, InstantLoad = instantload = function() {
     domChangeListener.observe(document.body, {childList: true});
     trackPreloadableElements();
     triggerEvent('change');
+    config.loadingStyle.endLoading();
 
   },
 
@@ -447,7 +518,12 @@ let instantload, InstantLoad = instantload = function() {
 
     if(cfg != null) {
 
-      //TODO: update config here with for loop using the keys
+      for(option in cfg) {
+
+        //we could do config = cfg, but if the user doesn't pass all config options, we would loose some values
+        config[option] = cfg[option];
+
+      }
 
     }
 

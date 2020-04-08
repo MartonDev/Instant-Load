@@ -20,7 +20,7 @@
       InstantLoad.on('postload', function() {console.log('after loading page');});
       InstantLoad.on('change', function() {console.log('page changed');});
     </script>
-    <script instantload-blacklist>InstantLoad.init();</script>
+    <script instantload-blacklist>InstantLoad.init({loadingStyle: InstantLoad.configOptions.loadingStyles.circle});</script>
 
   </body>
 </html>
