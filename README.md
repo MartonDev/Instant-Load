@@ -37,6 +37,45 @@ InstantLoad offers high level customizations via it's config. You can pass your 
 
 More coming soon...
 
+## API
+The InstantLoad object returns some useful values. Let's take a look at them!
+
+### `InstantLoad.init()`
+This will initialize the InstantLoad script and start speeding up you site
+
+### `InstantLoad.config()`
+This will return the current config for the library. You can also use it to change the config, after initializing InstantLoad.
+
+### `InstantLoad.on('eventType', callback)`
+Used to add your own events to InstantLoad. More belove
+
+### `InstantLoad.history`
+This will return the history of your site, after initializing the library.
+
+### `InstantLoad.configOptions`
+This stores the options for different config elements
+
+### `InstantLoad.isRunning`
+Check if InstantLoad had been initialized
+
+### Blacklisting scripts
+If you don't want your scripts to get re-inserted and re-initialized, you will find the `instantload-blacklist` attribute really useful. Add it to your scripts to blacklist it from InstantLoad, like this:
+
+    <script src="/path/to/my/script.js" instantload-blacklist></script>
+
+## Event Handling
+InstantLoad has it's own events, and you can listen to them like this:
+
+    InstantLoad.on('change', function() {console.log('Page changed')});
+    
+### Event types
+|Event type|Description|
+|----------|-----------|
+|`init`    |Occurs after the initialization of InstantLoad|
+|`preload` |Occurs before preloading a page, when hovering a link|
+|`postload`|Occurs after preloading a page, when hovering a link|
+|`change`  |Occurs after changing the page|
+
 ## Customize the loading styles
 You can configure the different loading styles via CSS. You can find the CSS selectors to use above.
 |Selector |Element |
@@ -45,6 +84,13 @@ You can configure the different loading styles via CSS. You can find the CSS sel
 |`#instantload-whiteScreen`|The blink styled loading's layer|
 |`#instantload-circle`|The circle styled spinner loading's container|
 |`#instantload-circle-spinner`|The circle styled loading's spinner|
+
+## Why did I make this library?
+I was working on a project of mine, and I wanted to use the well-known [instantclick.io](https://github.com/dieulot/instantclick) library, but I realized, that while it is great and very much useful, it lacks some customizations I'd like to use and it is a bit buggy. 
+
+So I sat down and wrote my own version of it. 
+
+Hope you like it :) Thank you for the inspiration [instantclick](https://github.com/dieulot/instantclick)
 
 ## Contributions
 You are more than welcome contributing to the library.
