@@ -17,7 +17,9 @@ let instantload, InstantLoad = instantload = function() {
   //the current request to preload a page
   currentPageReq = null,
   //the instentload container in the dom
-  instantloadContainer = null;
+  instantloadContainer = null,
+  //current location modified by the library
+  currentLocation = null;
 
   //functions and arrays
   const preloadedPages = [],
@@ -303,6 +305,7 @@ let instantload, InstantLoad = instantload = function() {
 
     }
 
+    currentLocation = location.href;
     domChangeListener.observe(document.body, {childList: true});
     trackPreloadableElements();
     triggerEvent('change', {eventType: 'change', popstateEvent: (url == null)});
@@ -352,6 +355,9 @@ let instantload, InstantLoad = instantload = function() {
   //back or forward button event
   popstateEvent = (e) => {
 
+    if(clearURL(location.href) == clearURL(currentLocation))
+      return;
+
     if(config.reloadPagesOnPopstate) {
 
       const fakePreloadElement = document.createElement('a');
@@ -384,6 +390,10 @@ let instantload, InstantLoad = instantload = function() {
   mouseOverEvent = (e) => {
 
     if(e.target.isPreloaded)
+      return;
+
+    //double check
+    if(!isPreloadable(e.target))
       return;
 
     preloadPage(clearURL(e.target.href), e.target, () => {
@@ -436,7 +446,7 @@ let instantload, InstantLoad = instantload = function() {
 
     const localhost = location.protocol + '//' + location.host + '/';
 
-    if(element.taget || element.href.indexOf(localhost) != 0 || isNoPreload(element))
+    if(element.taget || element.href.indexOf(localhost) != 0 || isNoPreload(element) || clearURL(element.href) == clearURL(location.href))
       return false;
 
     return true;
@@ -553,6 +563,8 @@ let instantload, InstantLoad = instantload = function() {
       }
 
     }
+
+    currentLocation = location.href;
 
     addCustomStyleAndElements();
     trackPreloadableElements();
