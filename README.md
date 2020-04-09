@@ -7,7 +7,7 @@ InstantLoad makes your website a one-page website by preloading the next page on
 ## Install
 CDN:
 
-    https://unpkg.com/instant-load@1.1.0/instantload.min.js
+    https://unpkg.com/instant-load@1.1.1/instantload.min.js
 
 NPM:
 
