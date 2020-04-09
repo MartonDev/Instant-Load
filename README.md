@@ -7,7 +7,7 @@ InstantLoad makes your website a one-page website by preloading the next page on
 ## Install
 CDN:
 
-    https://unpkg.com/instant-load@1.0.1/instantload.min.js
+    https://unpkg.com/instant-load@1.1.0/instantload.min.js
 
 NPM:
 
@@ -66,15 +66,15 @@ If you don't want your scripts to get re-inserted and re-initialized, you will f
 ## Event Handling
 InstantLoad has it's own events, and you can listen to them like this:
 
-    InstantLoad.on('change', function() {console.log('Page changed')});
-    
+    InstantLoad.on('change', function(event) {console.log('Page changed', event)});
+
 ### Event types
-|Event type|Description|
-|----------|-----------|
-|`init`    |Occurs after the initialization of InstantLoad|
-|`preload` |Occurs before preloading a page, when hovering a link|
-|`postload`|Occurs after preloading a page, when hovering a link|
-|`change`  |Occurs after changing the page|
+|Event type|Return values |Description|
+|----------|-----------|-----------|
+|`init`    |`eventType`: `init`<br>`trackedElements`: All preloadable elements |Occurs after the initialization of InstantLoad|
+|`preload` |`eventType`: `preload` |Occurs before preloading a page, when hovering a link|
+|`postload`|`eventType`: `postload`<br>`success`: Whether the request was successful<br>`message`: Request message |Occurs after preloading a page, when hovering a link|
+|`change`  |`eventType`: `change`<br>`popstateEvent`: Whether the change was triggered by the back/forward arrows or not |Occurs after changing the page|
 
 ## Customize the loading styles
 You can configure the different loading styles via CSS. You can find the CSS selectors to use above.
@@ -86,9 +86,9 @@ You can configure the different loading styles via CSS. You can find the CSS sel
 |`#instantload-circle-spinner`|The circle styled loading's spinner|
 
 ## Why did I make this library?
-I was working on a project of mine, and I wanted to use the well-known [instantclick.io](https://github.com/dieulot/instantclick) library, but I realized, that while it is great and very much useful, it lacks some customizations I'd like to use and it is a bit buggy. 
+I was working on a project of mine, and I wanted to use the well-known [instantclick.io](https://github.com/dieulot/instantclick) library, but I realized, that while it is great and very much useful, it lacks some customizations I'd like to use and it is a bit buggy.
 
-So I sat down and wrote my own version of it. 
+So I sat down and wrote my own version of it.
 
 Hope you like it :) Thank you for the inspiration [instantclick](https://github.com/dieulot/instantclick)
 

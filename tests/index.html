@@ -15,10 +15,10 @@
 
     <script src="../instantload.min.js" instantload-blacklist></script>
     <script instantload-blacklist>
-      InstantLoad.on('init', function() {console.log('init triggered');});
-      InstantLoad.on('preload', function() {console.log('before loading page');});
-      InstantLoad.on('postload', function() {console.log('after loading page');});
-      InstantLoad.on('change', function() {console.log('page changed');});
+      InstantLoad.on('init', function(e) {console.log('init triggered', e);});
+      InstantLoad.on('preload', function(e) {console.log('before loading page', e);});
+      InstantLoad.on('postload', function(e) {console.log('after loading page', e);});
+      InstantLoad.on('change', function(e) {console.log('page changed', e);});
     </script>
     <script instantload-blacklist>InstantLoad.init({loadingStyle: InstantLoad.configOptions.loadingStyles.circle});</script>
 

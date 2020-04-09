@@ -1,6 +1,6 @@
 {
   "name": "instant-load",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A JavaScript library to speed up your site",
   "main": "index.js",
   "scripts": {
@@ -16,7 +16,8 @@
     "url": "https://github.com/MartonDev/Instant-Load/issues"
   },
   "homepage": "https://github.com/MartonDev/Instant-Load#readme",
-  "devDependencies": {
-    "uglify-js": "^3.8.1"
+  "devDependencies": {},
+  "dependencies": {
+    "uglify-es": "^3.3.9"
   }
 }

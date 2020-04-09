@@ -175,11 +175,11 @@ let instantload, InstantLoad = instantload = function() {
   },
 
   //trigger custom InstantLoad events
-  triggerEvent = (eventType) => {
+  triggerEvent = (eventType, event) => {
 
     for(let i = 0; i < events[eventType].length; i++) {
 
-      events[eventType][i]();
+      events[eventType][i](event);
 
     }
 
@@ -305,7 +305,7 @@ let instantload, InstantLoad = instantload = function() {
 
     domChangeListener.observe(document.body, {childList: true});
     trackPreloadableElements();
-    triggerEvent('change');
+    triggerEvent('change', {eventType: 'change', popstateEvent: (url == null)});
     config.loadingStyle.endLoading();
 
   },
@@ -314,7 +314,7 @@ let instantload, InstantLoad = instantload = function() {
   //triggers preload event, stores the preloaded data within the element, triggers postload event
   preloadPage = (url, element, callback) => {
 
-    triggerEvent('preload');
+    triggerEvent('preload', {eventType: 'preload'});
 
     currentPageReq = new XMLHttpRequest();
 
@@ -323,15 +323,27 @@ let instantload, InstantLoad = instantload = function() {
     currentPageReq.send();
     currentPageReq.onload = () => {
 
+      if(currentPageReq.status != 200) {
+
+        triggerEvent('postload', {eventType: 'postload', success: false, message: `Status: ${currentPageReq.status} ${currentPageReq.statusText}`});
+        return;
+
+      }
+
       //creating an empty document to fill with the response
       let newDocument = document.implementation.createHTMLDocument('');
 
       newDocument.documentElement.innerHTML = currentPageReq.responseText;
       element.preloadedPage = newDocument;
 
-      triggerEvent('postload');
+      triggerEvent('postload', {eventType: 'postload', success: true, message: `Status: ${currentPageReq.status} ${currentPageReq.statusText}`});
 
       callback();
+
+    };
+    currentPageReq.ontimeout = () => {
+
+      triggerEvent('postload', {eventType: 'postload', success: false, message: 'Timeout'});
 
     };
 
@@ -553,7 +565,7 @@ let instantload, InstantLoad = instantload = function() {
     };
     domChangeListener.observe(document.body, {childList: true});
 
-    triggerEvent('init');
+    triggerEvent('init', {eventType: 'init', trackedElements: preloadableElements});
 
   };
 
